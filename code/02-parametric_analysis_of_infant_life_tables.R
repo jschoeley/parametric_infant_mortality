@@ -1,6 +1,24 @@
 # Parametric analysis of US infant life-tables
-# Jonas Schöley
-# 2018-03-13
+# cc-by Jonas Schöley
+# 2019-04-29
+
+# The purpose of this analysis is to identify the functional form of the
+# relationship between time since birth and the risk of infant death. In order
+# to do that I fit various candidate models to the observed day-to-day mortality
+# rates of US infant populations and compare their fits.
+# Differences in the age-trajectory of infant mortality between sexes, cohorts,
+# social- and medical strata are further analyzed by fitting the
+# exponentially-truncated power-law hazard.
+
+# 1. Load a collection of US infant life-tables.
+# 2. Plot age-specific mortality over the first year of life for US infants.
+# 3. Fit negative-Gompertz and various power-law hazards to the age-specific
+#    US infant mortality, neo-natal and post-neonatal mortality. Compare fits.
+# 4. Fit the exponentially-truncated power-law hazard to US age-specific infant
+#    mortality by sex, cohort, medical and social strata.
+# 5. Compare the deviance of various models.
+# 6. Bootstrap confidence intervals for the parameters of the fitted
+#    exponentially-truncated power-law models.
 
 # Libraries ---------------------------------------------------------------
 
@@ -56,20 +74,22 @@ MyTheme <- function (scaler = 1) {
   theme_classic() +
     theme(
       plot.subtitle = element_text(color = 'black', size = 7*scaler, face = 'bold'),
-      plot.caption =  element_text(color = 'black', size = 7*scaler),
+      plot.caption =  element_text(color = 'black', size = 5*scaler),
       axis.title.x = element_text(color = 'black', size = 7*scaler),
       axis.title.y = element_text(color = 'black', size = 7*scaler),
       axis.text = element_text(color = 'black', size = 7*scaler),
       strip.text = element_text(color = 'black', size = 7*scaler),
       line = element_line(size = 0.3*scaler, lineend = 'square'),
       axis.title = element_text(face = 'bold'),
-      #panel.grid.major.y = element_line(color = 'grey90', size = 0.5),
       axis.ticks = element_line(color = 'black'),
       strip.background = element_blank(),
       plot.background = element_blank(),
       plot.margin = unit(c(1, 0, 0, 0.5), units = 'mm')
     )
 }
+
+# figure width (mm)
+fig_width = 124.6
 
 # Modelling functions -----------------------------------------------------
 
@@ -80,19 +100,20 @@ MyTheme <- function (scaler = 1) {
 # A GLM with single non-linear parameter gets fit
 # by maximizing that parameters profile likelihood.
 #
-# <formula>: formula as string with non-linear parameter represented as
+# <df>: A data frame.
+# <formula>: Formula as string with non-linear parameter represented as
 #            <#[<lower>, <upper>]>, where <lower> and <upper> are the
-#            bounds of the parameter-space that is searched
-# <glm_fnct>: unquoted name of the glm function used for fitting the model.
-#             tested with `glm()` and `glm.nb()`
-# <method>: method for maximizing the profile-likelihood of the non-linear
+#            bounds of the parameter-space that is searched.
+# <glm_fnct>: Unquoted name of the glm function used for fitting the model.
+#             Tested with `glm()` and `glm.nb()`.
+# <method>: Method for maximizing the profile-likelihood of the non-linear
 #           parameter. "optim" for 1-dimensional optimization or "grid" for
 #           a grid-search. Choose "grid" if a likelihood-profile is required.
-# <grid_n>: if method = "grid", the number of points on the grid from
-#           <lower> to <upper>
+# <grid_n>: If method = "grid", the number of points on the grid from
+#           <lower> to <upper>,
 # <log_search>: Should the parameter search be performed in log-space?
-#               Choose true if the range varies over many orders of magnitude.
-#               (default=FALSE)
+#               Choose true if the range varies over many orders of magnitude
+#               (default=TRUE).
 FitGALM <- function (df, formula, glm_fnct = glm, method = 'optim',
                      grid_n = 100, log_search = TRUE, ...) {
 
@@ -183,6 +204,17 @@ FitGALM <- function (df, formula, glm_fnct = glm, method = 'optim',
 
 }
 
+# Predict Rates From Poisson GLM Fit
+#
+# Predicted rates, counts, associated confidence intervals and
+# residuals from a fitted Poisson GLM.
+#
+# <glm_fit>: A GLM object, i.e. the output of a Poisson GLM fit.
+# <exposures>: Unquoted variable name of the exposure variable specified
+#              in the Poisson GLM fit.
+# <inverse_link>: Unquoted function name of the inverse-link (default=exp).
+# <resid_type>: The type of residual to report, see residuals.glm()
+#               (default='pearson').
 PredictRates <- function(glm_fit, exposures,
                          inverse_link = exp, resid_type = 'pearson') {
 
@@ -215,7 +247,13 @@ PredictRates <- function(glm_fit, exposures,
 
 }
 
-# Goodness-of-fit Statistics From GLM
+# Goodness-of-fit Statistics for GLM Fit
+#
+# Report goodness-of-fit statistics for a fitted GLM.
+#
+# <fit>: A GLM object, i.e. the output of a GLM fit.
+# <null_fit>: The fit of a null-model. A GLM object. If not given
+#             the standard null model is used.
 GoodnessOfFitGLM <- function (fit, null_fit = NULL) {
 
   pearson_resid <- residuals(fit, type = 'pearson')
@@ -245,6 +283,30 @@ GoodnessOfFitGLM <- function (fit, null_fit = NULL) {
 
 }
 
+# Fit Multiple Generalized Almost-Linear-Models (GALMs)
+#
+# Multiple GALMs can be specified with each one fitted across multiple strata.
+#
+# <df>: A data frame.
+# <models>: A vector of formulas as strings with non-linear parameter
+#           represented as <#[<lower>, <upper>]>, where <lower> and <upper>
+#           are the bounds of the parameter-space that is searched.
+# <exposures>: Unquoted variable name of the exposure variable specified
+#              in the Poisson GLM fit.
+# <null_model>: The fit of a null-model. A GLM object. If not given
+#               the standard null model is used.
+# <glm_fnct>: Unquoted name of the glm function used for fitting the model.
+#             Tested with `glm()` and `glm.nb()`.
+# <method>: Method for maximizing the profile-likelihood of the non-linear
+#           parameter. "optim" for 1-dimensional optimization or "grid" for
+#           a grid-search. Choose "grid" if a likelihood-profile is required.
+# <grid_n>: If method = "grid", the number of points on the grid from
+#           <lower> to <upper>,
+# <log_search>: Should the parameter search be performed in log-space?
+#               Choose true if the range varies over many orders of magnitude
+#               (default=TRUE).
+# <strata>:  Quosure quos(...) of unquoted variable names of the population
+#            strata.
 FitMultipleGALMs <- function (
   df, models, exposures = nEx, null_model = NULL,
   glm_fnct = glm, method = 'optim',
@@ -313,15 +375,15 @@ FitMultipleGALMs <- function (
 
 # Plotting functions ------------------------------------------------------
 
-# Residual plot over continous x
+# Plot Residuals over Continous Domain
 #
-# <df>: a data frame of residuals over x
-# <x>: continous predictor (e.g. age)
-# <res_x>: residuals
-# <outlier_sd>: standard deviation of outliers
-# <extreme_outlier_sd>: standard deviation of extreme outliers
-# <lab_x>: x label
-# <lab_y>: y label
+# <df>: Data frame of residuals over x.
+# <x>: Continous predictor (e.g. age).
+# <res_x>: Unquoted variable name of residual variable.
+# <outlier_sd>: Standard deviation of outliers (default = 3).
+# <extreme_outlier_sd>: Standard deviation of extreme outliers (default = 15).
+# <lab_x>: x label.
+# <lab_y>: y label.
 PlotResidualsOverX <-
   function (df, x = x, resid_x = resid,
             outlier_sd = 3, extreme_outlier_sd = 15,
@@ -603,13 +665,13 @@ PlotStratifiedTPFits <-
 
   }
 
-# Load infant life-tables -------------------------------------------------
+# 1. Load infant life-tables ----------------------------------------------
 
 # Load a collection of US infant life-tables.
 
 load('data/ilts.Rdata')
 
-# Plot infant life-table --------------------------------------------------
+# 2. Plot infant life-table -----------------------------------------------
 
 # Plot infant mortality trajectory US 2005-2010.
 
@@ -640,7 +702,10 @@ plot_imort_lx <-
     y = NULL,
     caption = 'Share of survivors at a given age'
   ) +
-  MyTheme(scaler = 0.8)
+  MyTheme(scaler = 0.8) +
+  theme(
+    plot.caption =  element_text(color = 'black', size = 0.8*7)
+  )
 
 plot_imort <-
   ilt_complete %>%
@@ -698,7 +763,8 @@ plot_imort <-
   scale_size_area(max_size = 10) +
   labs(
     x = 'Time Since Birth [Days]',
-    y = 'Mortality Rate'
+    y = 'Mortality Rate',
+    caption = 'Note: Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval.\nRaw data: NCHS CohortLinked Birth - Infant Death Data Files.'
   ) +
   coord_cartesian(clip = 'off') +
   MyTheme()
@@ -707,16 +773,16 @@ ggsave(
   'plot_imort.pdf',
   plot = plot_imort,
   path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
+  units = 'mm', width = fig_width, height = 70, dpi = 300
 )
 ggsave(
   'plot_imort.png',
   plot = plot_imort,
   path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
+  units = 'mm', width = fig_width, height = 70, dpi = 300
 )
 
-# Fit GP vs. PW -----------------------------------------------------------
+# 3. Fit GP vs. PW --------------------------------------------------------
 
 # Fit Gompertz and power models to US 2005-2010 infant mortality.
 
@@ -862,16 +928,16 @@ ggsave(
   'plot_compare_models.pdf',
   plot = plot_compare_models,
   path = 'out',
-  units = 'mm', width = 122, height = 122, dpi = 300
+  units = 'mm', width = fig_width, height = fig_width, dpi = 300
 )
 ggsave(
   'plot_compare_models.png',
   plot = plot_compare_models,
   path = 'out',
-  units = 'mm', width = 122, height = 122, dpi = 300
+  units = 'mm', width = fig_width, height = fig_width, dpi = 300
 )
 
-# Fit TP ------------------------------------------------------------------
+# 4. Fit TP ---------------------------------------------------------------
 
 # Fit truncated-power models to a range of life-tables.
 
@@ -940,13 +1006,7 @@ ggsave(
   'plot_apgar.pdf',
   plot = plot_apgar,
   path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
-)
-ggsave(
-  'plot_apgar.png',
-  plot = plot_apgar,
-  path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
+  units = 'mm', width = fig_width, height = 60, dpi = 300
 )
 
 plot_origin <-
@@ -961,15 +1021,8 @@ ggsave(
   'plot_origin.pdf',
   plot = plot_origin,
   path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
+  units = 'mm', width = fig_width, height = 60, dpi = 300
 )
-ggsave(
-  'plot_origin.png',
-  plot = plot_origin,
-  path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
-)
-
 
 plot_prematurity <-
   all_the_tp_fits %>%
@@ -983,13 +1036,7 @@ ggsave(
   'plot_prematurity.pdf',
   plot = plot_prematurity,
   path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
-)
-ggsave(
-  'plot_prematurity.png',
-  plot = plot_prematurity,
-  path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
+  units = 'mm', width = fig_width, height = 60, dpi = 300
 )
 
 plot_education <-
@@ -1004,16 +1051,10 @@ ggsave(
   'plot_education.pdf',
   plot = plot_education,
   path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
-)
-ggsave(
-  'plot_education.png',
-  plot = plot_education,
-  path = 'out',
-  units = 'mm', width = 122, height = 61, dpi = 300
+  units = 'mm', width = fig_width, height = 60, dpi = 300
 )
 
-# Analysis of deviance ----------------------------------------------------
+# 5. Analysis of deviance -------------------------------------------------
 
 fit_ilt_month_sex <-
   ilt_month_sex %>%
@@ -1125,7 +1166,10 @@ tab_all_the_deviances <-
 
 save(tab_all_the_deviances, file = 'out/tab_all_the_deviances.Rdata')
 
-# Confidence intervals ----------------------------------------------------
+# 6. Confidence intervals -------------------------------------------------
+
+# Calculate confidence intervals around parameter estimates for the
+# exponentially-truncated power-law hazard.
 
 # simulate K responses from fitted GLM model and add to original data
 SimulateResonsesGLM <- function (df, fit, K = 100) {
@@ -1147,6 +1191,7 @@ SimulateResonsesGLM <- function (df, fit, K = 100) {
 
 }
 
+# test: compare simulated life-tables with observed infant life-table
 SimulateResonsesGLM(
   ilt_complete,
   fit_ilt_complete %>%
@@ -1160,6 +1205,10 @@ SimulateResonsesGLM(
   geom_point(aes(y = nmx), size = 0.3) +
   scale_y_log10()
 
+# compute confidence intervals for all the parameters of the
+# truncated-power model fit to infant life-tables by sex, cohort and
+# stratume. confidence intervals based on parametric bootstrap from the
+# fitted TP model.
 all_the_CIs <-
   all_the_tp_fits %>%
   group_by(cohort, sex, variable, stratum) %>%
@@ -1231,23 +1280,41 @@ all_the_CIs <-
   }) %>%
   ungroup()
 
+save(all_the_CIs, file = 'out/all_the_CIs.Rdata')
+
+all_the_CIs_ready_to_plot <-
+  all_the_CIs %>%
+  ungroup() %>%
+  gather(statistic, value, M_mean:c_q975) %>%
+  separate(statistic, c('statistic', 'smry'), sep = '_') %>%
+  spread(smry, value) %>%
+  mutate(statistic = factor(statistic, levels = c('a', 'b', 'c', 'p', 'M')))
+
+# sanity-check: plot parameter estimates and confidence intervals by stratum
 all_the_CIs %>%
   ungroup() %>%
   gather(statistic, value, M_mean:c_q975) %>%
   separate(statistic, c('statistic', 'smry'), sep = '_') %>%
   spread(smry, value) %>%
   ggplot(aes(x = stratum)) +
-  geom_pointrange(aes(y = mean, ymin = q025, ymax = q975, color = sex),
-                  position = position_dodge(width = 0.3),
-                  shape = '|') +
+  geom_pointrange(
+    aes(
+      y = mean,
+      ymin = q025,
+      ymax = q975,
+      color = sex,
+      group = interaction(cohort, sex)
+    ),
+    position = position_dodge(width = 0.3),
+    size = 1, fatten = 0.7
+  ) +
   scale_y_log10() +
   facet_grid(variable~statistic, scales = 'free') +
-  theme_bw() +
+  MyTheme(scaler = 1.2) +
+  theme(panel.border = element_rect(fill = NA)) +
   coord_flip()
 
-save(all_the_CIs, file = 'out/all_the_CIs.RData')
-
-# M: factor of mortality reduction over the first 7 days of life
+# Table of M: factor of mortality reduction over the first 7 days of life
 all_the_CIs_M <-
   all_the_CIs %>%
   select(cohort, sex, variable, stratum, M_mean:M_q975) %>%
@@ -1257,12 +1324,19 @@ all_the_CIs_M <-
   ) %>%
   mutate(M = paste0(M_mean, ' (', M_q025, ', ', M_q975, ')')) %>%
   select(-M_mean, -M_q025, -M_q975) %>%
-  unite(cohort_sex, cohort, sex) %>%
-  spread(cohort_sex, M)
+  spread(sex, M) %>%
+  group_by(cohort) %>%
+  slice(
+    3, 1, 2,
+    8, 9, 7, 10,
+    11, 14, 12, 13,
+    5, 6, 4
+  ) %>%
+  ungroup()
 
 save(all_the_CIs_M, file = 'out/all_the_CIs_M.Rdata')
 
-# a parameter of truncated-power hazard model
+# Table of a: level of infant mortality
 all_the_CIs_a <-
   all_the_CIs %>%
   select(cohort, sex, variable, stratum, a_mean:a_q975) %>%
@@ -1272,12 +1346,19 @@ all_the_CIs_a <-
   ) %>%
   mutate(a = paste0(a_mean, ' (', a_q025, ', ', a_q975, ')')) %>%
   select(-a_mean, -a_q025, -a_q975) %>%
-  unite(cohort_sex, cohort, sex) %>%
-  spread(cohort_sex, a)
+  spread(sex, a) %>%
+  group_by(cohort) %>%
+  slice(
+    3, 1, 2,
+    8, 9, 7, 10,
+    11, 14, 12, 13,
+    5, 6, 4
+  ) %>%
+  ungroup()
 
 save(all_the_CIs_a, file = 'out/all_the_CIs_a.Rdata')
 
-# b parameter of truncated-power hazard model
+# Table of b: rate of post-neonatal mortality decline
 all_the_CIs_b <-
   all_the_CIs %>%
   select(cohort, sex, variable, stratum, b_mean:b_q975) %>%
@@ -1287,12 +1368,19 @@ all_the_CIs_b <-
   ) %>%
   mutate(b = paste0(b_mean, ' (', b_q025, ', ', b_q975, ')')) %>%
   select(-b_mean, -b_q025, -b_q975) %>%
-  unite(cohort_sex, cohort, sex) %>%
-  spread(cohort_sex, b)
+  spread(sex, b) %>%
+  group_by(cohort) %>%
+  slice(
+    3, 1, 2,
+    8, 9, 7, 10,
+    11, 14, 12, 13,
+    5, 6, 4
+  ) %>%
+  ungroup()
 
 save(all_the_CIs_b, file = 'out/all_the_CIs_b.Rdata')
 
-# c parameter of truncated-power hazard model
+# Table of c: Location shift
 all_the_CIs_c <-
   all_the_CIs %>%
   select(cohort, sex, variable, stratum, c_mean:c_q975) %>%
@@ -1302,57 +1390,36 @@ all_the_CIs_c <-
   ) %>%
   mutate(c = paste0(c_mean, ' (', c_q025, ', ', c_q975, ')')) %>%
   select(-c_mean, -c_q025, -c_q975) %>%
-  unite(cohort_sex, cohort, sex) %>%
-  spread(cohort_sex, c)
+  spread(sex, c) %>%
+  group_by(cohort) %>%
+  slice(
+    3, 1, 2,
+    8, 9, 7, 10,
+    11, 14, 12, 13,
+    5, 6, 4
+  ) %>%
+  ungroup()
 
 save(all_the_CIs_c, file = 'out/all_the_CIs_c.Rdata')
 
-# Shock-recovery vs. competing risks --------------------------------------
-
-library(bbmle)
-
-the_data <-
-  ilt_cohort_sex_apgar %>%
-  filter(id == 17)
-
-model1 <-
-  mle2(
-    nDx~dpois(exp(a+p*log(x+exp(c))+b*x+log(nEx))),
-    start = list(a = log(1e-4), p = -1e-1, c = log(1e-5), b = -1e-2),
-    data = the_data
-  )
-
-the_data %>%
-  mutate(
-    pred_nmx = predict(model1)/nEx
+# Table of p: Elasticity of neonatal mortality decline
+all_the_CIs_p <-
+  all_the_CIs %>%
+  select(cohort, sex, variable, stratum, p_mean:p_q975) %>%
+  mutate_at(
+    vars(-cohort, -sex, -variable, -stratum),
+    ~formatC(., digits = 1, format = 'e', width = 0)
   ) %>%
-  ggplot(aes(x = x, y = nmx)) +
-  geom_point() +
-  geom_line(aes(y = pred_nmx), color = 'red', size = 1) +
-  scale_y_log10() +
-  theme_classic()
-
-model2 <-
-  mle2(
-    nDx ~ dpois(
-      exp(a1 + p*log(x+exp(c)) + log(nEx)) +
-        exp(a2 + b*x + log(nEx)
-        )
-    ),
-    start = list(a1 = log(1e-4), a2 = log(1e-4), p = -1e-1, c = log(1e-5), b = -1e-2),
-    data = the_data
-  )
-
-
-the_data %>%
-  mutate(
-    pred_nmx = predict(model2)/nEx
+  mutate(p = paste0(p_mean, ' (', p_q025, ', ', p_q975, ')')) %>%
+  select(-p_mean, -p_q025, -p_q975) %>%
+  spread(sex, p) %>%
+  group_by(cohort) %>%
+  slice(
+    3, 1, 2,
+    8, 9, 7, 10,
+    11, 14, 12, 13,
+    5, 6, 4
   ) %>%
-  ggplot(aes(x = x, y = nmx)) +
-  geom_point() +
-  geom_line(aes(y = pred_nmx), color = 'red', size = 1) +
-  scale_y_log10() +
-  theme_classic()
+  ungroup()
 
-summary(model1)
-summary(model2)
+save(all_the_CIs_p, file = 'out/all_the_CIs_p.Rdata')

@@ -1,28 +1,22 @@
 ---
 title: 'The Age-Trajectory of Infant Mortality in the United States: Parametric Models and Generative Mechanisms'
-titlerunning: 'The Age-Trajectory of Infant Mortality'
-authors:
-  - name: 'Jonas Schöley'
-    address: 'Interdisciplinary Centre on Population Dynamics, University of Southern Denmark'
-    email: 'jschoeley@health.sdu.dk'
-authorrunning: 'Schöley'
+author: #'Jonas Schöley^[Interdisciplinary Centre on Population Dynamics, University of Southern Denmark. Correspondence: <jschoeley@health.sdu.dk>. During the writing of this article the author was a guest at the Max-Planck Institute for Demographic Research and funded by a grant from AXA Insurance.]'
 output:
   bookdown::pdf_book:
-     template: springer.tex
+     template: demogre.tex
      citation_package: natbib
      fig_caption: yes
      keep_tex: yes
-classoption: smallextended
 header-includes:
-  - \usepackage{array,longtable,booktabs,multirow,lscape}
-  #- \usepackage[section]{placeins}
-  #- \usepackage{endfloat}
-  #- \DeclareDelayedFloatFlavor{landscape}{table}
 bibliography: [references.bib]
-abstract: |
-  Demographers are uncertain about the shape of infant mortality during the first year of life. While there is a consensus that the risk of death follows a Gompertz law over much of the adult age span, no such agreement exists about the parametric form of mortality at the very beginning of life with most literature on the topic suggesting either an exponential or some power-law expression. Based on individual level US birth and death register data I present evidence that the age-trajectory of infant mortality displays both power-law and exponential behavior and is better described by a product of those functions: an "exponentially-truncated power law". Across all infant populations under consideration the age-trajectory of mortality following birth is initially dominated by a power-law regime and over the course of infancy eventually approaches an exponential decline of less than a 1% reduction per additional day of age. The speed of the transition from a power-law to an exponential decline in the risk of death varies greatly by medical strata (5 minute APGAR score, birthweight and age of gestation at birth). The observed truncated power-law behavior may be the result of a shock-recovery or a mortality selection process.
-thanks: |
-  During the writing of this article the author was a guest at the Max-Planck Institute for Demographic Research and funded by a grant from AXA Insurance.
+background: |
+  While there is a consensus that the risk of death follows a Gompertz law over much of the adult age span, no such agreement exists about the parametric form of mortality at the very beginning of life with most literature on the topic suggesting either an exponential or various power-law expressions.
+objective: |
+  In this paper I aim to identify the parametric shape of the infant mortality age-trajectory as observed in recent US birth cohorts across a range of social and medical strata.
+results: |
+  Age-specific infant mortality in the US displays both power-law and exponential behavior and is better described by a product of those functions: an "exponentially-truncated power-law". Across all infant populations under consideration the age-trajectory of mortality following birth is initially dominated by a power-law regime and over the course of infancy eventually approaches an exponential decline of less than a 1% reduction per additional day of age. The hazard of infant death varies in a highly non-proportional fashion by prematurity and health of the infant upon birth.
+contribution: |
+  The exponentially-truncated power-law hazard is a novel tool for the study of infant mortality being more parsimonious than smoothing-splines while providing interpretable parameters and an excellent fit over a range of diverse populations. The transition from a power-law dominated neonatal mortality schedule to an exponential post-neonatal hazard has not been noted before and suggests an underlying shock-recovery or mortality selection process.
 keywords:
   - Infant mortality
   - Infant life-table
@@ -46,35 +40,35 @@ knitr::opts_chunk$set(
 
 \newpage
 
-# Background {-}
+# Background
 
-Since Benjamin Gompertz published his eponymous law of mortality for the adult ages many suggestions have been made for a law of similar generality describing the age pattern of infant and/or childhood mortality. Maybe the earliest attempt was published by @Oppermann1870 who proposed^[Throughout the paper $\mu(x)$ denotes the force of mortality at age $x$.] $\mu(x)=ax^{-1/2}+b+cx^{1/2}$ for mortality prior to age 20. With a power-law as first term this formula has the curious feature of predicting an infinite risk of death at the moment of birth, a property that reportedly was important to Oppermann though the reasons remain unclear [@Steffensen1930]. One year later @Thiele1871, motivated by the search for a mortality law covering the whole human life-span assumed^[...after giving a full-page credit to Oppermann and only stopping short of apologizing for proposing a different expression...] $\mu(x) = ae^{-bx}$, the hazard of a negative Gompertz distribution, for the changing risk of death prior to maturity. *These two expressions, a power-law and an exponential, constitute the functional basis for most parametric models of infant/childhood mortality employed thereon.* Different power-law hazards have been used to describe the age pattern of infant mortality by @Brillinger1961, @Choe1981, @DeBeer2016 and @Berrut2016; Gompertz-like exponential functions appeared as infant mortality terms in @Siler1979, @Mode1982, @Rogers1994; and compositions of power- and exponential function have been suggested by @Wittstein1883 and @Heligman1980.
+Since Benjamin Gompertz published his eponymous law of mortality for the adult ages many suggestions have been made for a law of similar generality describing the age pattern of infant and/or childhood mortality. Perhaps the earliest attempt was published by @Oppermann1870 who proposed^[Throughout the paper $\mu(x)$ denotes the force of mortality at age $x$.] $\mu(x)=ax^{-1/2}+b+cx^{1/2}$ for mortality prior to age 20. With a power-law as first term this formula has the curious feature of predicting an infinite risk of death at the moment of birth, a property that reportedly was important to Oppermann though the reasons remain unclear [@Steffensen1930]. One year later @Thiele1871, motivated by the search for a mortality law covering the whole human life-span assumed^[...after giving a full-page credit to Oppermann and only stopping short of apologizing for proposing a different expression...] $\mu(x) = ae^{-bx}$, the hazard of a negative Gompertz distribution, for the changing risk of death prior to maturity. *These two expressions, a power-law and an exponential, constitute the functional basis for most parametric models of infant/childhood mortality employed thereafter* Different power-law hazards have been used to describe the age pattern of infant mortality by @Brillinger1961, @Choe1981, @DeBeer2016 and @Berrut2016; Gompertz-like exponential functions appeared as infant mortality terms in @Siler1979, @Mode1982, @Rogers1994; and compositions of power- and exponential functions have been suggested by @Wittstein1883 and @Heligman1980.
 
-The mortality models above can be interpreted as describing a not further specified risk to which an infant adapts over time, resulting in a continuous decline in mortality as the child grows [as explicitly stated by @Siler1979; @Heligman1980].^[An exception is @Oppermann1870 who essentially proposed a competing risks model though the meaning Oppermann gave to the three components of his formula is unknown.] @Levitis2011 called this the "acquired robustness hypothesis". A "competing-risks" explanation was proposed by @Bourgeois-Pichat1951 who hypothesized that the observed age pattern of mortality over the first year of life is the result of two separate processes: intrinsic mortality due to congenital disorders and extrinsic mortality due to accidents and maltreatment of the child. Noticing that the cumulative distribution of deaths during the post-neonatal period ($>1$ month of age) is closely matched by a linear function of $\log_{10}^3(\text{days since birth + 1})$ while neonatal deaths follow a different age-trajectory Bourgeois-Pichat proposed that intrinsic and extrinsic mortality over age do not share the same functional form and that extrinsic mortality only starts to dominate over intrinsic mortality after the first month of life.
+The mortality models above can be interpreted as describing an unspecified risk to which an infant adapts over time, resulting in a continuous decline in mortality as the child grows [as explicitly stated by @Siler1979; @Heligman1980].^[An exception is @Oppermann1870 who essentially proposed a competing risks model though the meaning Oppermann gave to the three components of his formula is unknown.] @Levitis2011 called this the "acquired robustness hypothesis". A "competing-risks" explanation was proposed by @Bourgeois-Pichat1951 who hypothesized that the observed age pattern of mortality over the first year of life is the result of two separate processes: intrinsic mortality due to congenital disorders and extrinsic mortality due to accidents and maltreatment of the child. Noticing that the cumulative distribution of deaths during the post-neonatal period ($>1$ month of age) is closely matched by a linear function of $\log_{10}^3(\text{days since birth + 1})$ while neonatal deaths follow a different age-trajectory, Bourgeois-Pichat proposed that intrinsic and extrinsic mortality over age do not share the same functional form and that extrinsic mortality only starts to dominate over intrinsic mortality after the first month of life.
 
-Some attempts have been made to express the parametric form of the infant hazard of death as a *frailty model* [@Vaupel1983; @Hougaard1984; @Vaupel1985]. An important insight from these models is that in a population where individuals differ significantly in their risk of death the average mortality over age is determined not only by individual level age-effects but also by *mortality selection*, i.e. the changing composition of a cohort towards individuals with low frailty [@Vaupel1979]. It has been demonstrated that a *declining* infant mortality age-trajectory may result from *constant* individual level hazards of different magnitudes [@Vaupel1983; @Vaupel1985]. @Hougaard1984 suggested that the high mortality right after birth and the fast subsequent decline may be the result of a large heterogeneity in individual frailties in the population of newborns.
+Some attempts have been made to express the parametric form of the infant hazard of death as a *frailty model* [@Vaupel1983; @Hougaard1984; @Vaupel1985]. An important insight from these models is that in a population where individuals differ significantly in their risk of death the average mortality over age is determined not only by individual level age-effects but also by *mortality selection*, i.e. the changing composition of a cohort towards individuals with low frailty [@Vaupel1979]. It has been demonstrated that a *declining* infant mortality age-trajectory may result from *constant* individual level hazards of different magnitudes [@Vaupel1983; @Vaupel1985]. @Hougaard1984 suggested that high mortality right after birth and the fast subsequent decline may be the result of a large heterogeneity in individual frailties in the population of newborns.
 
 In the presence of the ubiquitous semi-parametric Cox proportional hazards model [@Cox1972] and penalized smoothing spline models for count data [@Eilers1996; @Camarda2016] it may seem like an exercise in nostalgia to consider parametric hazard expressions as a basis for the analysis of the infant mortality age pattern. Yet a parametric treatment of deaths during the first year of life comes with unique advantages:
 
 1) Successes in combating infant mortality over the past century made infant death an increasingly rare event in large parts of the world [@WHO2006; @WHO2015]. This challenges the statistician to develop a methodology suited to inference from rare events, especially if the object of study is infant mortality over age, on the regional level, by season, in nations with a small population, by socio-economic group, by cause-of-death, or by any combination of those criteria. If correctly specified, parametric survival models alleviate the statistical challenge of small event counts. By imposing a tight structure on the distribution of life-times one can gain insight from comparatively little data. Furthermore, a parametric specification of infant mortality expressed in terms of observable quantities (e.g. mortality at the day of birth, rate of post-neonatal mortality decline) facilitates the use of Bayesian methodology -- a useful tool for working with sparse data -- because informative prior distributions on the parameters are easily specified if the parameters are well understood.
 
-2) Parametric models may allow insight into the mechanisms that determine the age-distribution of infant deaths. This is especially apparent with regards to the frailty model [@Vaupel1979] which expresses the age-pattern of mortality on the population level as emerging from heterogeneous individual level hazards via selective mortality.
+2) Parametric models may allow insight into the mechanisms that determine the age-distribution of infant deaths. This is especially apparent with regard to the frailty model [@Vaupel1979] which expresses the age-pattern of mortality on the population level as emerging from heterogeneous individual level hazards via selective mortality.
 
-3) Information on the ages at death during infancy may only be available in broad age groups (e.g. birth to 1 day, 1 day to 1 week, 1 week to 1 month, months 1 to 12). If the parametric form of the ages at death during the first year of life is known this information can be used to graduate the grouped data. This is especially relevant for demographers who are interested a precise estimation of the "average age at death during infancy", a relevant statistic for the construction of life-tables.
+3) Information on the ages at death during infancy may only be available in broad age groups (e.g. birth to 1 day, 1 day to 1 week, 1 week to 1 month, months 1 to 12). If the parametric form of the ages at death during the first year of life is known this information can be used to graduate the grouped data. This is especially relevant for demographers who are interested in a precise estimation of the "average age at death during infancy", a relevant statistic for the construction of life-tables.
 
-The advantages above depend on the correct functional specification for the age distribution of infant deaths. Identifying this distribution requires a) data on the precise timing of each infant death in a birth cohort (ideally on a day-to-day basis); b) a cohort of infants large enough for a clear trend in the age-trajectory of infant mortality rates to dominate over random variation; and c) data on multiple birth-cohorts, and sub-populations so that it is possible to check the generality of the identified functional form. The individual level data on millions of births and infant deaths provided by the @NCHS2016 fits these requirements and for this article I confine the search for a "law" of infant mortality to the US population.
+The advantages above depend on the correct functional specification for the age distribution of infant deaths. Identifying this distribution requires a) data on the precise timing of each infant death in a birth cohort (ideally on a day-to-day basis); b) a cohort of infants large enough for a clear trend in the age-trajectory of infant mortality rates to dominate over random variation; and c) data on multiple birth-cohorts, and sub-populations so that it is possible to check the generality of the identified functional form. The individual level data on millions of births and infant deaths provided by the @NCHS2016 fit these requirements and for this article I confine the search for a "law" of infant mortality to the US population.
 
-After a brief description of the data, the methods and the current day-to-day age pattern of infant mortality in the United States I will present evidence for both power-law *and* exponential behavior of the age-trajectory of infant death. Both types of models are then synthesized into a *truncated power-law* hazard expression, a generalization of both the power-law and negative Gompertz hazards, which fit is evaluated on life-tables for various cohorts and sub-populations of US infants. A discussion of the generative mechanisms which could give rise to a truncated power-law hazard concludes the paper.
+After a brief description of the data, the methods and the current day-to-day age pattern of infant mortality in the United States I will present evidence for both power-law *and* exponential behavior of the age-trajectory of infant death. Both types of models are then synthesized into a *truncated power-law* hazard expression, a generalization of both the power-law and negative Gompertz hazards, whose fit is evaluated on life-tables for various cohorts and sub-populations of US infants. A discussion of the generative mechanisms which could give rise to a truncated power-law hazard concludes the paper.
 
-# Data {-}
+# Data
 
 The "NCHS Cohort Linked Birth -- Infant Death Data Files" [@NCHS2016] contain a complete census of births and infant deaths on the territory of the United States^[Available data on the overseas territories has been excluded due to compatibility issues.] and feature most fields present on the birth and infant-death certificates. The size and detail of the data allows for the calculation of day-to-day infant life-tables for various sub-populations.
 
 I confine the analysis to the quinquennial birth cohorts 1995-1999 and 2005-2009 stratified by sex, prematurity, five minute APGAR score and social background of the mother. Those particular variables constitute major sources of heterogeneity in infant mortality along biological, medical and social dimensions and are among the most reliably reported fields.^[It must be noted that the results of this paper can not be generalized to populations other than present day US infants without further study. While similar results for countries with similar overall levels of infant mortality (implying a similar level of development) are to be expected, it would be foolish to assume the same age pattern of infant mortality in pre-20th century populations or present populations suffering under a crisis: Historically the age-pattern of infant mortality was very much shaped by the interaction of seasonality effects, improper substitutes for breast-feeding, and deadly infectious diseases [@Knodel1977; @Huck1995], factors which have lost relevance in the US over the course of the 20th century. Likewise an analysis of 21st century US infant mortality yields little insight into the characteristics of infant death in parts of the world suffering from humanitarian crises and violent conflicts.] In total I analyse data on 277,004 infant deaths out of 40,727,055 births over the birth cohorts 1995--1999 and 2005--2009.
 
-Female and male infant life-tables are calculated for both birth cohorts, each life-table stratified by either the five minute APGAR score (an ordinal measure of an infants vitality shortly after delivery discretized into 3 levels), prematurity (defined via age of gestation upon delivery and discretized into 4 levels), mother's education (3 levels) or mothers ethnicity (4 levels). Those 56 life-tables thus cover heterogeneity in the age-trajectory of infant mortality among period, medical and social strata.
+Female and male infant life-tables are calculated for both birth cohorts, each life-table stratified by either the five minute APGAR score (an ordinal measure of an infant's vitality shortly after delivery discretized into 3 levels), prematurity (defined via age of gestation upon delivery and discretized into 4 levels), mother's education (3 levels) or mother's ethnicity (4 levels). Those 56 life-tables thus cover heterogeneity in the age-trajectory of infant mortality across period, medical and social strata.
 
-# Methods {-}
+# Methods
 
 In order to determine the functional shape of infant mortality over the first year of life I fit the exponentially-truncated shifted-power family of hazards^[In the following referred to simply as "truncated power" hazard.] to the day-to-day death counts and exposures for various populations of US infants. Let $\mu(x)$ be the force of mortality (the hazard) at age $x$. The truncated power family is given by the expression
 
@@ -82,20 +76,19 @@ $$
 \mu_\text{TP}(x) = a(x+c)^{-p}e^{-bx},
 $$
 
-and contains many of the models proposed in the literature on infant mortality age-trajectories as special cases, such as the hazard functions of the negative Gompertz [@Lomax1954; @Marshall2007, pp. 368] and the Pareto II distribution [@Lomax1954; @Marshall2007, pp. 400], the exponential-Gamma frailty parametrization of the Pareto II distribution [@Clayton1985; @Wienke2011, p. 78], (shifted)-power hazards and their (shifted)-Weibull parametrizations [@Lehman1963; @Marshall2007, pp. 321, see figure \@ref(fig:plot-models)]. Having all these models nested in a single family facilitates goodness-of-fit comparisons: A simpler model may be rejected in favor of a more complicated one on the grounds of significance test on the parameters and the whole family of models can be rejected if the full expression fails to accurately describe the data.
+and contains many of the models proposed in the literature on infant mortality age-trajectories as special cases, such as the hazard functions of the negative Gompertz [@Lomax1954; @Marshall2007, pp. 368] and the Pareto II distribution [@Lomax1954; @Marshall2007, pp. 400], the exponential-Gamma frailty parametrization of the Pareto II distribution [@Clayton1985; @Wienke2011, p. 78], (shifted)-power hazards and their (shifted)-Weibull parametrizations [@Lehman1963; @Marshall2007, pp. 321, see Figure \@ref(fig:plot-models)]. Having all these models nested in a single family facilitates goodness-of-fit comparisons: A simpler model may be rejected in favor of a more complicated one on the grounds of significance test on the parameters and the whole family of models can be rejected if the full expression fails to accurately describe the data.
 
 ```{r plot-models, fig.cap='The exponentially-truncated shifted-power family of hazards considered for the age-trajectory of infant mortality. The family contains the negative Gompertz, Pareto II, and Weibull hazards.'}
-# fig1
-knitr::include_graphics('fig/models.pdf')
+knitr::include_graphics('fig/figure1.pdf')
 ```
 
-Prior to fitting the full truncated-hazard model to the data I will discuss the respective properties and parameter interpretation of the nested power- and negative Gompertz- hazards and demonstrate their fit (or lack thereof) to the observed death rates of the complete cohort of infants born in the US 2005 to 2009. This is to build evidence that it takes both a power- and an exponential component to adequately describe mortality over infancy, a subtlety that to my best knowledge has remained unmentioned by the literature so far.
+Prior to fitting the full truncated-hazard model to the data I will discuss the respective properties and parameter interpretation of the nested power- and negative Gompertz- hazards and demonstrate their fit (or lack thereof) to the observed death rates of the complete cohort of infants born in the US 2005 to 2009. This is to build evidence that it takes both a power- and an exponential component to adequately describe mortality over infancy, a subtlety that to my best knowledge has remained unmentioned in the literature so far.
 
-In a second analysis I test the fit of the truncated power hazard by birth cohort, sex, APGAR score, gestation at birth, origin- and education of the mother. Confronting a mortality model with such a heterogeneous collection of life-tables acts as a validity test and allows for the quantification of heterogeneous mortality trajectories via comparison of model coefficients across population strata. Particular attention will be paid to non-proportional variations of the hazard, and to the behavior of the hazard during the neonatal period (the first month of life) and during the post-neonatal period (month 1 to 12 of age).
+In a second analysis I test the fit of the truncated power hazard by birth cohort, sex, APGAR score, gestation at birth, origin- and education of the mother. Confronting a mortality model with such a heterogeneous collection of life-tables acts as a validity test and allows for the quantification of heterogeneous mortality trajectories via comparison of model coefficients across population strata. Particular attention will be paid to non-proportional variations of the hazard, and to the behavior of the hazard during the neonatal period (the first month of life) and during the post-neonatal period (months 1 to 12 of age).
 
-All the models in this paper are fitted as generalized linear models (GLMs). Such an approach guarantees concave likelihood surfaces and consequently stable estimation of the model parameters while also capitalizing on the wide availability of software to fit and evaluate GLMs. By using suitable link functions and/or transformations of the age variable a range of parametric hazard functions can be linearized and thus fit to observed age specific death counts and exposures via a Poisson-GLM [@Aitkin1980; @Clayton1983; @Currie2016].
+All the models in this paper are fitted as generalized linear models (GLMs). Such an approach guarantees concave likelihood surfaces and consequently stable estimation of the model parameters while also capitalizing on the wide availability of software to fit and evaluate GLMs. By using suitable link functions and/or transformations of the age variable a range of parametric hazard functions can be linearized and thus fitted to observed age specific death counts and exposures via a Poisson-GLM [@Aitkin1980; @Clayton1983; @Currie2016].
 
-The truncated power family of hazards (and therefore the nested negative Gompertz, Weibull and Pareto hazards, see figure \@ref(fig:plot-models)) may be fit, after deciding on the value for $c$, as Poisson-GLMs with a log-link. This is possible due to the semi-linearity of $\mu_\text{TP}(x)$ on the log-scale:
+The truncated power family of hazards (and therefore the nested negative Gompertz, Weibull and Pareto hazards, see Figure \@ref(fig:plot-models)) may be fit, after deciding on the value for $c$, as Poisson-GLMs with a log-link. This is possible due to the semi-linearity of $\mu_\text{TP}(x)$ on the log-scale:
 
 $$
 \log \mu_\text{TP}(x) = \log(a)-p\log(x+c)-bx = \beta_0+\beta_1\log(x+c)+\beta_2x,
@@ -103,25 +96,23 @@ $$
 
 with $a = \exp(\beta_0)$, $p=-\beta_1$ and $b=-\beta_2$. The non-linear $c$ parameter is estimated by maximizing the *profile likelihood* [@Murphy2000] of $c$ over a range of GLM fits.^[Let $\mathcal{L}(\boldsymbol\beta,c)$ be the full likelihood of a GLM fit with coefficients $\boldsymbol\beta$ and age-offset $c$. The profile likelihood of $c$ is given by $\mathcal{L}_{p}(c) = \max_{\boldsymbol\beta} \mathcal{L}(\boldsymbol\beta,c)$ and $c$ is estimated as $\hat c = \arg\max_{c}[\max_{\boldsymbol\beta} \mathcal{L}(\boldsymbol\beta,c)]$. I found $\mathcal{L}_{p}(c)$ to be concave over $c$ and the maximization was quick and stable.] Model inference is performed via the model deviances, Pearson-residuals, and a pseudo-$R^2$ criterion based on the fitted models deviance versus the deviance of the null (intercept-only) model. Confidence intervals around the parameter estimates of the truncated power hazard are calculated from 1000 repeated fits of the model on 1000 different parametric-bootstrap replicates of each life-table. Unlike the asymptotic standard errors retrieved from the GLM fit the bootstrap approach incorporates the uncertainty associated with the estimation of the non-linear $c$ parameter.
 
-# The age-trajectory of US infant mortality {-}
+# The age-trajectory of US infant mortality
 
-The age-trajectory of infant mortality as observed in the US birth cohort 2005-2009 is characterized by a peak right at birth with a rapid decline thereafter (see figure \@ref(fig:plot-imort)). While the mortality rate over the first hour following birth is around 0.02 (deaths per person-day of exposure), 24 hours later the hazard is at only $1.1\,\%$ of its initial value and then again drops by a factor of 10 over the next 29 days. Around one month after birth the hazard starts to decline with a near constant relative-rate, approaching an exponential behavior.
+The age-trajectory of infant mortality as observed in the US birth cohort 2005-2009 is characterized by a peak at birth with a rapid decline thereafter (see Figure \@ref(fig:plot-imort)). While the mortality rate over the first hour following birth is around 0.02 (deaths per person-day of exposure), 24 hours later the hazard is at only $1.1\,\%$ of its initial value and then again drops by a factor of 10 over the next 29 days. Around one month after birth the hazard starts to decline with a near constant relative-rate, approaching an exponential behavior.
 
-```{r plot-imort, fig.cap='Mortality rates over the first year of life for the US birth cohort 2005-2009. Mortality drops rapidly during the neonatal period after which it approches an exponential decline. Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval. Raw data: NCHS Cohort Linked Birth - Infant Death Data Files.'}
-# fig2
-knitr::include_graphics('fig/plot_imort.pdf')
+```{r plot-imort, fig.cap='Mortality rates over the first year of life for the US birth cohort 2005-2009. Mortality drops rapidly during the neonatal period after which it approches an exponential decline.'}
+knitr::include_graphics('fig/figure2.pdf')
 ```
 
-The pattern of a "super-exponential" decline in mortality during the neonatal period followed by an exponential tail over the remainder of the first year of life holds true for girls and boys, irrespective of the social background of their mothers, the APGAR score upon birth, the gestation at birth or birth cohort (see figures \@ref(fig:plot-apgar), \@ref(fig:plot-origin), \@ref(fig:plot-prematurity), \@ref(fig:plot-education)).
+The pattern of a "super-exponential" decline in mortality during the neonatal period followed by an exponential tail over the remainder of the first year of life holds true for girls and boys, irrespective of the social background of their mothers, the APGAR score upon birth, the gestation at birth or birth cohort (see Figures \@ref(fig:plot-apgar), \@ref(fig:plot-origin), \@ref(fig:plot-prematurity), \@ref(fig:plot-education)).
 
-# Evidence for an exponentially-truncated power hazard {-}
+# Evidence for an exponentially-truncated power hazard
 
-```{r plot-evidence, fig.cap='Fitted versus observed mortality over the first year of life for the US birth cohort 2005-2009. The age-trajectory of infant mortality in the US exhibits both power-law and exponential behavior. While the negative Gompertz hazard with its exponential shape achieves the poorest of fits over the complete infancy period (a) it performs exceptionally well as a description for the post-neonatal mortality decline (b). Among the power-law expressions only the flexibly-shifted power hazard is capable of capturing the rapid decline in mortality over the first hours and days of life (e), still all three power-laws under consideration exhibit clear trends in their residuals over age (c, d, e). By combining a power-law and a negative Gompertz hazard in the truncated power model (f) we take into account the different behavior of the hazard in the neonatal- and post-neonatal periods and achieve a close fit over the entire first year of life. Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval. $R^2$ is the percentage of deviance explained by the model. The Pearson-residuals mark the distance between prediction and observation in terms Poisson standard deviations around the prediction. Raw data: NCHS Cohort Linked Birth - Infant Death Data Files.'}
-# fig3
-knitr::include_graphics('fig/plot_compare_models.pdf')
+```{r plot-evidence, fig.cap='Fitted versus observed mortality over the first year of life for the US birth cohort 2005-2009. Combining a power-law and a negative Gompertz hazard in the truncated power model (f) accounts for the different behavior of the hazard in the neonatal- and post-neonatal periods and achieves a close fit over the entire first year of life.'}
+knitr::include_graphics('fig/figure3.pdf')
 ```
 
-## Negative Gompertz hazard {-}
+## Negative Gompertz hazard
 
 @Thiele1871, in an early attempt to model mortality across the whole human age-span, proposed to express the risk of death prior to maturity as an exponential function of age,
 
@@ -131,7 +122,7 @@ $$
 
 with $(x,a,b)\geq 0$. This is the hazard function of a Gompertz distribution with a negative $b$ parameter and therefore mirrors the shape of the hazard commonly assumed for adult humans. The simplicity of an exponential term for the hazard facilitates analytic treatment and gives the parameters a direct interpretation as important quantities in the study of infant mortality, $\mu_\text{GP}(0)=a$ being the hazard of death at the moment of birth and $-\frac{\mu'_\text{GP}(x)}{\mu_\text{GP}(x)}=b$ the instantaneous relative rate of mortality decline over age. The fact that the risk drops with a constant relative rate over age is the defining feature of the negative Gompertz hazard. Related quantities are independent of age as well: the time $t$ it takes for the hazard to drop by a factor $k$ is the solution to equation $\frac{\mu_\text{GP}(x+t)}{\mu_\text{GP}(x)} = \frac{1}{k}$ given by $t_{1/k}=\frac{\log(k)}{b}$ and for each unit increase in age the hazard changes by a factor $\frac{\mu_\text{GP}(x+1)}{\mu_\text{GP}(x)}=\exp(-b)$.
 
-The negative Gompertz hazard can be expressed as a log-linear model with Poisson distributed age-specific death counts $D_x$ as outcome and age-specific exposure times $E_x$ as fixed offset^[Assuming that the width of each age group is small enough as to not introduce substantial aggregation bias.]
+The negative Gompertz hazard can be expressed as a log-linear model with Poisson distributed age-specific death counts $D_x$ as outcome and age-specific exposure times $E_x$ as a fixed offset^[Assuming that the width of each age group is small enough as to not introduce substantial aggregation bias.]
 
 $$
 \log\text{E}[D|x] = \beta_0 + \beta_1x + \log E_x, \text{with}~D\sim\text{Poisson}.
@@ -148,16 +139,18 @@ load('out/tab_lowest_deviance.Rdata')
 tab_lowest_deviance %>%
   kable(
     format = 'latex',
-    caption = 'Number of months over the five year period 2005-2009 a negative Gompertz fit achieved a lower deviance on the post-neonatal cohort life-tables compared to a given power-law fit. Data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.',
+    caption = 'Number of months over the five year period 2005-2009 a negative Gompertz fit achieved a lower deviance on the post-neonatal cohort life-tables compared to a given power-law fit.',
     booktabs = T,
     align = c('l', 'l', 'l')
   ) %>%
-  kable_styling()
+  row_spec(0, bold = TRUE) %>%
+  kable_styling() %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
 ```
 
-Figure \@ref(fig:plot-evidence)a clearly shows that the age-trajectory of infant mortality for the 2005-2009 US birth cohort deviates from a pure log-linear (i.e. exponential) form, ruling out the Gompertz hazard as a suitable model for the entire infant age range. *Yet*, a log-linear decline constitutes a near perfect description of the mortality trajectory over the post-neonatal period (figure \@ref(fig:plot-evidence)b). The rate of death at day 30 after birth is around 2.03 deaths per 100,000 person-days of exposure with a subsequent decline of about $0.93\,\%$ per additional day of age. Remarkably these two numbers explain $97.8\,\%$ of the total deviance in the data during the post-neonatal period. Further investigating this result I fit negative Gompertz and power-law hazards to the post-neonatal life-tables for each of the 60 monthly US birth-cohorts from January 2005 to December 2009 separate by sex. In the majority of the cases the negative Gompertz hazard provided a closer fit to the observed post-neonatal mortality trajectory than either of the alternative two or three parameter power-law hazards (table \@ref(tab:tab-postneonatal)).
+Figure \@ref(fig:plot-evidence)a clearly shows that the age-trajectory of infant mortality for the 2005-2009 US birth cohort deviates from a pure log-linear (i.e. exponential) form, ruling out the Gompertz hazard as a suitable model for the entire infant age range. *Yet*, a log-linear decline constitutes a near perfect description of the mortality trajectory over the post-neonatal period (Figure \@ref(fig:plot-evidence)b). The rate of death at day 30 after birth is around 2.03 deaths per 100,000 person-days of exposure with a subsequent decline of about $0.93\,\%$ per additional day of age. Remarkably these two numbers explain $97.8\,\%$ of the total deviance in the data during the post-neonatal period. Further investigating this result I fit negative Gompertz and power-law hazards to the post-neonatal life-tables for each of the 60 monthly US birth-cohorts from January 2005 to December 2009 separate by sex. In the majority of the cases the negative Gompertz hazard provided a closer fit to the observed post-neonatal mortality trajectory than either of the alternative two or three parameter power-law hazards (table \@ref(tab:tab-postneonatal)).
 
-## Power-law hazard {-}
+## Power-law hazard
 
 Various power laws have been specified to characterize the age-specific hazard of infant death [@Oppermann1870; @Brillinger1961; @Choe1981; @DeBeer2016; @Berrut2016] all of which are variations on the basic expression
 
@@ -165,9 +158,9 @@ $$
 \mu_\text{PW}(x)=ax^{-p},
 $$
 
-with $(a,p)\geq0$ and $x>0$. Just like a negative Gompertz hazard, a power-law hazard monotonically approaches 0 as $x\rightarrow\infty$, however, the relative rate of decline of a power hazard varies with age according to $-\frac{\mu'_\text{PW}(x)}{\mu_\text{PW}(x)} =\frac{p}{x}$, i.e. it is greatest right after birth and approaches 0 as age increases. It is this behavior that allows a power-law to initially decline faster than a Gompertz hazard, yet slower for larger $x$, rendering it potentially useful for the description of the day-to-day age pattern of infant mortality.
+with $(a,p)\geq0$ and $x>0$. Just like a negative Gompertz hazard, a power-law hazard monotonically approaches 0 as $x\rightarrow\infty$, however, the relative rate of decline of a power hazard varies with age according to $-\frac{\mu'_\text{PW}(x)}{\mu_\text{PW}(x)} =\frac{p}{x}$, i.e. it is greatest right after birth and approaches 0 as age increases. It is this behavior that allows a power-law to initially decline faster than a Gompertz hazard, yet become slower for larger $x$, rendering it potentially useful for the description of the day-to-day age pattern of infant mortality.
 
-Similar to the Gompertz case the parameters of the power hazard can be interpreted in terms of mortality level and rate-of-change: The risk of death at age $x=1$ is given by $\mu_\text{PW}(1)=a$ and the proportional change in mortality for change in age by proportion $w$ is $\frac{\mu_\text{PW}(wx)}{\mu_\text{PW}(x)}=w^{-p}$. The proportional increase in age $w$ needed for the hazard to drop by factor $k$ is the solution to equation $\frac{\mu_\text{PW}(wx)}{\mu_\text{PW}(x)}=1/k$ given by $t_{1/k}= k^{\frac{1}{p}}$. The power parameter $p$ by itself represents the elasticity of the hazard, $\frac{\text{d}\log\mu_\text{PW}(x)}{\text{d}\log x}=-p$, i.e. for every infinitesimal proportional increase in age the hazard drops by proportion $p$. A convenient property of power laws is that the elasticity is invariant to any re-scaling of age in the form $x'=wx$. In practice this means that the units used for the age column of the infant life-tables (e.g. hours, days, weeks) have no effect on the estimation of the exponent $p$.
+Similar to the Gompertz case, the parameters of the power hazard can be interpreted in terms of mortality level and rate-of-change: The risk of death at age $x=1$ is given by $\mu_\text{PW}(1)=a$ and the proportional change in mortality for change in age by proportion $w$ is $\frac{\mu_\text{PW}(wx)}{\mu_\text{PW}(x)}=w^{-p}$. The proportional increase in age $w$ needed for the hazard to drop by factor $k$ is the solution to equation $\frac{\mu_\text{PW}(wx)}{\mu_\text{PW}(x)}=1/k$ given by $t_{1/k}= k^{\frac{1}{p}}$. The power parameter $p$ by itself represents the elasticity of the hazard, $\frac{\text{d}\log\mu_\text{PW}(x)}{\text{d}\log x}=-p$, i.e. for every infinitesimal proportional increase in age the hazard drops by proportion $p$. A convenient property of power laws is that the elasticity is invariant to any re-scaling of age in the form $x'=wx$. In practice this means that the units used for the age column of the infant life-tables (e.g. hours, days, weeks) have no effect on the estimation of the exponent $p$.
 
 Note that $\mu_\text{PW}$ can be re-parametrized into the hazard of the Weibull distribution $\mu_\text{UW}(x)=bkx^{k-1}$ by substituting $p=1-k$ and $a=bk$.
 
@@ -181,9 +174,9 @@ $$
 \mu_\text{UP}(x) = a(x+1)^{-p},
 $$
 
-with $(x, a, p)\geq 0$. Due to the unity offset the risk of death at the moment of birth is $\mu_\text{UP}(0)=a$. The elasticity of $\mu_\text{UP}(x)$ approaches $-p$ as $x\rightarrow \infty$. In practice I found $-p$ to be a very close approximation to the true elasticity of $\mu_\text{UP}(x)$ for at least the post-neonatal period thus one may safely interpret $p$ as the approximate proportional drop in the hazard of infant death for an infinitesimal proportional change in age starting at day 30 after birth.
+with $(x, a, p)\geq 0$. Due to the unity offset the risk of death at the moment of birth is $\mu_\text{UP}(0)=a$. The elasticity of $\mu_\text{UP}(x)$ approaches $-p$ as $x\rightarrow \infty$. In practice I found $-p$ to be a very close approximation to the true elasticity of $\mu_\text{UP}(x)$ for at least the post-neonatal period, thus one may safely interpret $p$ as the approximate proportional drop in the hazard of infant death for an infinitesimal proportional change in age starting at day 30 after birth.
 
-The unity-shifted power hazard can be fit as the log-linear Poisson regression
+The unity-shifted power hazard can be fitted as the log-linear Poisson regression
 
 $$
 \log\text{E}[D|x] =
@@ -195,7 +188,7 @@ with $a = \exp(\beta_0)$ and $p = -\beta_1$.
 
 Note that $\mu_\text{UP}$ can be translated into the unity-shifted Weibull hazard $\mu_\text{UW}(x)=bk(x+1)^{k-1}$ by substituting $k=1-p$ and $b=a/(1-p)$.
 
-While the unity-shifted power-law fits the 2005-2009 US infant life-table better than the Gompertz hazard a look at the Pearson residuals in figure \@ref(fig:plot-evidence)c still indicates a systematic misspecification. Due to its very nature the unity-shifted power-law can not capture the exponential portion of the hazard and it also fails to adequately describe the extremely fast drop in the risk of death over the first hours following birth.
+While the unity-shifted power-law fits the 2005-2009 US infant life-table better than the Gompertz hazard, the Pearson residuals in Figure \@ref(fig:plot-evidence)c still indicate a systematic misspecification. Due to its very nature the unity-shifted power-law can not capture the exponential portion of the hazard and it also fails to adequately describe the extremely fast drop in the risk of death over the first hours following birth.
 
 ### Pareto hazard {-}
 
@@ -205,9 +198,9 @@ $$
 \mu_\text{PT}(x) = a(x+c)^{-1},
 $$
 
-where $(x, a)\geq 0$ and $c > 0$. While for the unity-shifted power-law the location offset is fixed and the power exponent varies the situation is reversed for the Pareto II hazard with a fixed power and a variable location offset. As $\mu_\text{PT}(x)$ is finite for $x>-c$ one may interpret the $c$ parameter as the duration $\mu_\text{PT}$ extends into the pre-natal period. For such an interpretation to be justified the intrapartum death-rates (death during labor, i.e. at $x<0$) have to follow the same functional form as the infant death rates and, given that $\mu(x+c)$ is declining with age, have to be higher than the mortality rates after birth. Of course the mortality at birth is $\mu_\text{PT}(0)=a/c$ with $a$ being the hazard level at $x=1-c$. The elasticity of the Pareto hazard is $\frac{\text{d}\log\mu_\text{PT}(x)}{\text{d}\log x}=-\frac{x}{x+c}$ which approaches $-1$ as $x\rightarrow\infty$. This implies a central characteristic of the Pareto hazard, namely that in the limit any proportional increase in age by factor $w$ results in a proportional change of the hazard by $1/w$, e.g. doubling age halves the hazard. In practice the estimated values for $c$ are small enough for this limiting behavior to set in shortly after birth.
+where $(x, a)\geq 0$ and $c > 0$. While for the unity-shifted power-law the location offset is fixed and the power exponent varies, the situation is reversed for the Pareto II hazard with a fixed power and a variable location offset. As $\mu_\text{PT}(x)$ is finite for $x>-c$ one may interpret the $c$ parameter as the duration $\mu_\text{PT}$ extends into the pre-natal period. For such an interpretation to be justified the intrapartum death-rates (death during labor, i.e. at $x<0$) have to follow the same functional form as the infant death rates and, given that $\mu(x+c)$ is declining with age, have to be higher than the mortality rates after birth. Of course the mortality at birth is $\mu_\text{PT}(0)=a/c$ with $a$ being the hazard level at $x=1-c$. The elasticity of the Pareto hazard is $\frac{\text{d}\log\mu_\text{PT}(x)}{\text{d}\log x}=-\frac{x}{x+c}$ which approaches $-1$ as $x\rightarrow\infty$. This implies a central characteristic of the Pareto hazard, namely that in the limit any proportional increase in age by factor $w$ results in a proportional change of the hazard by $1/w$, e.g. doubling age halves the hazard. In practice the estimated values for $c$ are small enough for this limiting behavior to set in shortly after birth.
 
-The Pareto hazard can be fit as
+The Pareto hazard can be fitted as
 
 $$
 \log\text{E}[D|x] = \beta_0 - \log(x+c) + \log E_x,~\text{with}~D\sim\text{Poisson},
@@ -217,7 +210,7 @@ an intercept-only model with additional offset $-\log(x+c)$ and $a=\exp(\beta_0)
 
 @Vaupel1983 propose to describe the infant/childhood component of human mortality by a Gamma-Exponential frailty model with population hazard function $\mu_\text{GE}(x)=\lambda/(1+\sigma^2\lambda x)$, i.e. a continuous mixture distribution of constant baseline hazards (corresponding to an exponential baseline distribution of deaths) with Gamma-distributed rate parameter $\lambda$. As noted by @Wienke2011 this model is equivalent to $\mu_\text{PT}$ when $a=1/\sigma^2$, i.e. the inverse of the variance parameter of the Gamma-Exponential frailty model, and $c = a/\lambda$. Therefore $\mu_\text{PT}$ may be interpreted as the population hazard resulting from mortality selection among individuals with constant hazards of Gamma-varying magnitudes.
 
-The fit of the Pareto hazard to the 2005-2009 US infant life-tables is similar to that of the shifted-power-law: inadequate (figure \@ref(fig:plot-evidence)d).
+The fit of the Pareto hazard to the 2005-2009 US infant life-tables is inadequate and similar to that of the shifted-power-law (Figure \@ref(fig:plot-evidence)d).
 
 ### Flexibly-shifted power hazard {-}
 
@@ -237,11 +230,11 @@ $$
 \log\text{E}[D|x] = \beta_0 + \beta_1\log(x+c) + \log E_x,~\text{with}~D\sim\text{Poisson},
 $$
 
-with the original parameters recovered as $a = \exp(\beta_0)$ and $p = -\beta_1$. Just like for the Pareto hazard $c$ is estimated by maximizing its profile-likelihood.
+with the original parameters recovered as $a = \exp(\beta_0)$ and $p = -\beta_1$. Just as for the Pareto hazard $c$ is estimated by maximizing its profile-likelihood.
 
-Allowing for both a free power parameter $p$ and a free location offset $c$ greatly improves the fit to the US 2005-2009 infant life-tables compared to the more restricted unity-shifted power and Pareto hazards (figure \@ref(fig:plot-evidence)e). The estimate for $c$ is 0.0012 (i.e. a location shift by $\approx1.7$ minutes of age) and for $p$ equals 0.69, corresponding to an approximate drop in mortality by $(1-2^{-0.69})\times100=38 \%$ for every doubling of age. While fitting better than the hazards discussed above, the Pearson residuals in figure \@ref(fig:plot-evidence)e still exhibit a clear curvature signifying a systematic lack of fit.
+Allowing for both a free power parameter $p$ and a free location offset $c$ greatly improves the fit to the US 2005-2009 infant life-tables compared to the more restricted unity-shifted power and Pareto hazards (Figure \@ref(fig:plot-evidence)e). The estimate for $c$ is 0.0012 (i.e. a location shift by $\approx1.7$ minutes of age) and for $p$ equals 0.69, corresponding to an approximate drop in mortality by $(1-2^{-0.69})\times100=38 \%$ for every doubling of age. While fitting better than the hazards discussed above, the Pearson residuals in Figure \@ref(fig:plot-evidence)e still exhibit a clear curvature signifying a systematic lack of fit.
 
-## Exponentially-truncated power-law hazard {-}
+## Exponentially-truncated power-law hazard
 
 Multiplying the flexibly-shifted power-law hazard $\mu_\text{FP}$ with an exponential term results in the exponentially-truncated power expression
 
@@ -249,7 +242,7 @@ $$
 \mu_\text{TP}(x) = a(x+c)^{-p}e^{-bx},
 $$
 
-with $(x, a, p, b)\geq 0$ and $c>0$. This hazard contains all of the above models as special cases (see figure \@ref(fig:plot-models)).
+with $(x, a, p, b)\geq 0$ and $c>0$. This hazard contains all of the above models as special cases (see Figure \@ref(fig:plot-models)).
 
 The power-component of the hazard is said to be "truncated" by the exponential component because with increasing age $\mu_\text{TP}$ approaches a constant relative rate of change, formally $\lim_{x\to\infty}\frac{\mu'_\text{TP}(x)}{\mu_\text{TP}(x)}=-b$.
 
@@ -261,62 +254,73 @@ $$
 
 where $a = \exp(\beta_0)$, $p = -\beta_1$, $b = -\beta_2$ and the non-linear coefficient $c$ is estimated via profile-likelihood maximization.
 
-Adding the exponential term to $\mu_\text{FP}$ significantly ($p<0.001$ via deviance-ratio test) improves the fit of the Poisson-GLM to the 2005-2009 US birth cohort and flattens the trend in the Pearson residuals over age (figure \@ref(fig:plot-evidence)f). Infant mortality over age eventually follows an exponential trajectory -- a result that, as will be demonstrated, holds true for different birth-cohorts, by sex, medical and social strata.
+Adding the exponential term to $\mu_\text{FP}$ significantly ($p<0.001$ via deviance-ratio test) improves the fit of the Poisson-GLM to the 2005-2009 US birth cohort and flattens the trend in the Pearson residuals over age (Figure \@ref(fig:plot-evidence)f). Infant mortality over age eventually follows an exponential trajectory -- a result that, as will be demonstrated, holds true for different birth-cohorts, by sex, medical and social strata.
 
-# Evaluation of the truncated power hazard {-}
+# Evaluation of the truncated power hazard
 
-The exponentially truncated power-law hazard achieves an excellent fit irrespective of cohort, sex, five minute APGAR score, gestational age at birth, origin or education of the mother. In all life-tables under consideration the percentage of deviance explained by the model ranges from 94.5% to 99.6%. For every single population the inclusion of an exponential term in addition to the shifted-power term significantly ($p<0.001$ via deviance-ratio tests) improves the fit, reducing the residual deviance by more than 50% on 43 out of the 56 populations (table \@ref(tab:tab-deviances)). 
+The exponentially truncated power-law hazard achieves an excellent fit irrespective of cohort, sex, five minute APGAR score, gestational age at birth, origin or education of the mother. In all life-tables under consideration the percentage of deviance explained by the model ranges from 94.5% to 99.6%. For every single population the inclusion of an exponential term in addition to the shifted-power term significantly ($p<0.001$ via deviance-ratio tests) improves the fit, reducing the residual deviance by more than 50% on 43 out of the 56 populations (Table \@ref(tab:tab-deviances)). 
 
 ```{r tab-deviances}
 # tab2
 load('out/tab_all_the_deviances.Rdata')
 
-tab_all_the_deviances %>%  
+tab_all_the_deviances %>%
+  # reorder
+  slice(
+    3, 1, 2,
+    8, 9, 7, 10,
+    11, 14, 12, 13,
+    5, 6, 4
+  ) %>%
   kable(
-    format = 'latex',
+    format = 'latex', escape = TRUE,
     caption = 'Percent reduction in residual deviance after truncating the power-law hazard with an exponential term. All results significant at $p<0.001$ (via deviance ratio tests).',
     booktabs = T,
     align = c('l', 'l', 'c', 'c', 'c', 'c'),
     col.names = c('', '', 'Female', 'Male', 'Female', 'Male')
   ) %>%
-  kable_styling() %>%
   add_header_above(
-    c(' ' = 2, '1995-1999' = 2, '2005-2009' = 2)
+    c(' ' = 2, '1995-1999' = 2, '2005-2009' = 2),
+    bold = TRUE
   ) %>%
-  collapse_rows(1, latex_hline = 'major')
+  row_spec(0, bold = TRUE) %>%
+  kable_styling() %>%
+  collapse_rows(1, latex_hline = 'major') %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
+
 ```
 
-The shape of the hazard function over age varies most strongly by APGAR score (figure \@ref(fig:plot-apgar)). The exponential behavior of the hazard is most pronounced for the population of infants born with a score of 9 or 10 (the majority of infants born). Within two weeks after delivery the initial mortality spike at birth transitions into a log-linear decline in mortality-risk of around 0.7% per day. Conversely, the hazard trajectory of the life-table for infants with a "low" APGAR score (indicating health problems of upon delivery), while still exponential in the tail, features a more gradual transition into log-linear behavior. The greatest difference in the behavior of the hazard among the APGAR groups can be seen over the first week of life. While for APGAR group 0 to 5 the hazard drops by a factor of 1000 from the day of birth to an age of seven days it only drops by a factor of 9 or less for the other groups. Thus hazards vary by APGAR score in a highly *non-proportional* fashion as can also be inferred from the varying power ($p$), exponential-rate ($b$) and offset ($c$) parameters of the fitted models. Non-proportional behavior, albeit less pronounced, is also evident when comparing hazards by prematurity, with higher values for the power parameter $p=-\beta_1$ for lower ages of gestation at birth^[A result also observed by @Berrut2016 for Swiss and Norwegian infants after fitting a simple power-law to age specific mortality rates.] (figure \@ref(fig:plot-prematurity)).
+The shape of the hazard function over age varies most strongly by APGAR score (Figure \@ref(fig:plot-apgar)). The exponential behavior of the hazard is most pronounced for the population of infants born with a score of 9 or 10 (the majority of infants born). Within two weeks after delivery the initial mortality spike at birth transitions into a log-linear decline in mortality-risk of around 0.7% per day. Conversely, the hazard trajectory of the life-table for infants with a "low" APGAR score (indicating health problems of upon delivery), while still exponential in the tail, features a more gradual transition into log-linear behavior. The greatest difference in the behavior of the hazard among the APGAR groups can be seen over the first week of life. While for APGAR group 0 to 5 the hazard drops by a factor of 1000 from the day of birth to an age of seven days it only drops by a factor of 9 or less for the other groups. Thus hazards vary by APGAR score in a highly *non-proportional* fashion as can also be inferred from the varying power ($p$), exponential-rate ($b$) and offset ($c$) parameters of the fitted models. Non-proportional behavior, albeit less pronounced, is also evident when comparing hazards by prematurity, with higher values for the power parameter $p=-\beta_1$ for lower ages of gestation at birth^[A result also observed by @Berrut2016 for Swiss and Norwegian infants after fitting a simple power-law to age specific mortality rates.] (Figure \@ref(fig:plot-prematurity)).
 
 The relative rate of mortality decline during the post-neonatal period (as approximated by $b$) is higher for premature infants and infants with a low APGAR score compared to infants born at term or with a regular APGAR score. This implies that the relative difference in mortality between very frail and less frail infants diminishes over age to some degree.
 
-Hazards are mostly proportional by ethnicity of the mother (figure \@ref(fig:plot-origin)) with the risk of death during the later stages of infancy declining exponentially with a rate of $0.3$ to $0.5\%$ per day of age and the power parameter ranging from $-0.51$ to $-0.55$ across the life-table strata. Notably during the post-neonatal period mortality over age declines slower for children of African-american mothers compared to infants of white mothers^[Significant at $p<0.05$ for female and male infants of either birth cohort, see table \@ref(tab:tab-ci-b) in the appendix and associated non-overlapping 95% confidence intervals around the $b$ parameter for African-american and white mothers.]; taken together with the observation that the intercept of the hazard curve is highest among infants of African-american mothers, this puts the group at a double disadvantage. Along education strata the hazards are proportional (figure \@ref(fig:plot-education)).
+Hazards are mostly proportional by ethnicity of the mother (Figure \@ref(fig:plot-origin)) with the risk of death during the later stages of infancy declining exponentially with a rate of $0.3$ to $0.5\%$ per day of age and the power parameter ranging from $-0.51$ to $-0.55$ across the life-table strata. Notably during the post-neonatal period mortality over age declines slower for children of African-American mothers compared to infants of white mothers^[Significant at $p<0.05$ for female and male infants of either birth cohort, see table \@ref(tab:tab-ci-b) in the appendix and associated non-overlapping 95% confidence intervals around the $b$ parameter for African-American and white mothers.]; taken together with the observation that the intercept of the hazard curve is highest among infants of African-American mothers, this puts the group at a double disadvantage. Along education strata the hazards are proportional (Figure \@ref(fig:plot-education)).
 
-Apart from a proportionally higher hazard for males compared to females there are no systematic differences in the age-trajectory of infant mortality between the sexes. Similarly the difference between the two birth cohorts is mostly proportional with the younger cohort having a lower intercept $\beta_0$ (figures \@ref(fig:plot-apgar)--\@ref(fig:plot-education)).
+Apart from a proportionally higher hazard for males compared to females there are no systematic differences in the age-trajectory of infant mortality between the sexes. Similarly the difference between the two birth cohorts is mostly proportional with the younger cohort having a lower intercept $\beta_0$ (Figures \@ref(fig:plot-apgar)--\@ref(fig:plot-education)).
 
-```{r plot-apgar, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and 5-minute APGAR score. Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval. $R^2$ is the percentage of deviance explained by the model. Raw data: NCHS Cohort Linked Birth - Infant Death Data Files.'}
+```{r plot-apgar, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and 5-minute APGAR score.'}
 # fig4
-knitr::include_graphics('fig/plot_apgar.pdf')
+knitr::include_graphics('fig/figure4.pdf')
 ```
 
-```{r plot-origin, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and ethnicity of the mother. Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval. $R^2$ is the percentage of deviance explained by the model. Raw data: NCHS Cohort Linked Birth - Infant Death Data Files.'}
+```{r plot-origin, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and ethnicity of the mother.'}
 # fig5
-knitr::include_graphics('fig/plot_origin.pdf')
+knitr::include_graphics('fig/figure5.pdf')
 ```
 
-```{r plot-prematurity, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and prematuriy. Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval. $R^2$ is the percentage of deviance explained by the model. Raw data: NCHS Cohort Linked Birth - Infant Death Data Files.'}
+```{r plot-prematurity, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and prematuriy.'}
 # fig6
-knitr::include_graphics('fig/plot_prematurity.pdf')
+knitr::include_graphics('fig/figure6.pdf')
 ```
 
-```{r plot-education, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and education of mother. Rates represent deaths per person-day of exposure. Circle area is proportional to the number of deaths at each interval. $R^2$ is the percentage of deviance explained by the model. Raw data: NCHS Cohort Linked Birth - Infant Death Data Files.'}
+```{r plot-education, fig.cap='Age specific hazard of death as predicted by the truncated power model contrasted with observed daily mortality rates by sex, birth-cohort, and education of mother.'}
 # fig7
-knitr::include_graphics('fig/plot_education.pdf')
+knitr::include_graphics('fig/figure7.pdf')
 ```
 
-# Interpretation of the truncated power hazard {-}
+# Interpretation of the truncated power hazard
 
-## A shock-recovery process {-}
+## A shock-recovery process
 
 The power-exponential product of the population hazard $\mu_\text{TP}$ can be interpreted as a *non-homogeneous split Poisson process*, where *shocks* to an infants health arrive with rate $\lambda(x)$ per unit person-time, each shock resulting in infant death with probability $p(x)$.^[Shock models in the context of human mortality have for example been studied by @Strehler1960, @Finkelstein2005, @Cha2016.]
 
@@ -326,15 +330,15 @@ $$
 \text{E}[{}_{n}D_x]=\int_x^{x+n}\lambda(x)p(x)N(x)\,\text{d}x,
 $$
 
-see @Prekopa1958 for a proof. The hazard of death experienced by survivors $N$ at time $x$ is $\mu(x) = \lambda(x)p(x)$. If the rate of shocks $\lambda(x)$ varies over time according to a flexibly-shifted power hazard and if the probability of a shock leading to death $p(x)$ is exponentially declining the truncated power-law hazard is recovered. Note that neither the rate of shocks nor the probability of death following a shock are identified as this would require inferring the model $\mu(x)=a_1(x+c)^{-p}\times a_2e^{-bx}$ from the fit $\mu(x)=a(x+c)^{-p}e^{-bx}$ -- a problem with infinitely many solutions. Completely identified however are the power and the exponential rate parameters $p$ and $b$ which can be interpreted as follows: For the extremely preterm female births of the US birth cohort 1995-1999 (figure \@ref(fig:plot-evidence)f) the rate of shocks, $\lambda(x)\propto(x+0.002)^{-0.74}$, declined rapidly in the vicinity of birth by approximately $(1-2^{-0.74})\times100=40\,\%$ for every doubling of age whereas the probability of a shock leading to death, $p(x)\propto e^{-bx}$, declined by about $0.9\,\%$ per additional day of age.
+see @Prekopa1958 for a proof. The hazard of death experienced by survivors $N$ at time $x$ is $\mu(x) = \lambda(x)p(x)$. If the rate of shocks $\lambda(x)$ varies over time according to a flexibly-shifted power hazard and if the probability of a shock leading to death $p(x)$ is exponentially declining the truncated power-law hazard is recovered. Note that neither the rate of shocks nor the probability of death following a shock are identified as this would require inferring the model $\mu(x)=a_1(x+c)^{-p}\times a_2e^{-bx}$ from the fit $\mu(x)=a(x+c)^{-p}e^{-bx}$ -- a problem with infinitely many solutions. However, the power and the exponential rate parameters $p$ and $b$ are completely identified and can be interpreted as follows: For the extremely preterm female births of the US birth cohort 1995-1999 (Figure \@ref(fig:plot-evidence)f) the rate of shocks, $\lambda(x)\propto(x+0.002)^{-0.74}$, declined rapidly in the vicinity of birth by approximately $(1-2^{-0.74})\times100=40\,\%$ for every doubling of age whereas the probability of a shock leading to death, $p(x)\propto e^{-bx}$, declined by about $0.9\,\%$ per additional day of age.
 
-Why use the power-law for the rate of shocks and the exponential term for the probability of a shock leading to death instead of the other way around -- after all both options lead to the same expression for $\mu(x)$. I find it likely that the rapid neonatal mortality decline is predominantly a result of the waning stresses of birth -- a sudden transition which may inflict a series of "shocks" to the infant -- and not the result of a fast decline in the mortality risk associated with each shock. Furthermore, as $\lim_{x\to\infty}\frac{\mu'_\text{FP}(x)}{\mu_\text{FP}(x)}=0$, the power-law approaches a constant hazard as age increases, allowing it to capture the age-independent rate of accidents which may dominate the rate of shocks later in infancy.
+Why should we use the power-law for the rate of shocks and the exponential term for the probability of a shock leading to death instead of the other way around -- after all both options lead to the same expression for $\mu(x)$? I find it likely that the rapid neonatal mortality decline is predominantly a result of the waning stresses of birth -- a sudden transition which may inflict a series of "shocks" to the infant -- and not the result of a fast decline in the mortality risk associated with each shock. Furthermore, as $\lim_{x\to\infty}\frac{\mu'_\text{FP}(x)}{\mu_\text{FP}(x)}=0$, the power-law approaches a constant hazard as age increases, allowing it to capture the age-independent rate of accidents which may dominate the rate of shocks later in infancy.
 
-A very specific shock-recovery process is described by the Strehler-Mildvan model of senescent mortality. @Strehler1960 propose a model where individuals experience shocks to their health at a constant rate $\alpha$. The magnitude of each shock, ranging from mild to severe, is a value drawn from an exponential random variable with rate $\beta$. The shocks are checked by the vitality of an individual which is a positive and declining function of age. When the magnitude of a shock at age $x$ exceeds the individuals vitality at that age, death occurs. @Strehler1960 show that this process leads to a Gompertz distribution of life-times with corresponding hazard function $\mu(x)=\alpha e^{\beta x}$.
+A very specific shock-recovery process is described by the Strehler-Mildvan model of senescent mortality. @Strehler1960 propose a model where individuals experience shocks to their health at a constant rate $\alpha$. The magnitude of each shock, ranging from mild to severe, is a value drawn from an exponential random variable with rate $\beta$. The shocks are counteracted by the vitality of an individual which is a positive and declining function of age. When the magnitude of a shock at age $x$ exceeds the individual's vitality at that age, death occurs. @Strehler1960 show that this process leads to a Gompertz distribution of life-times with corresponding hazard function $\mu(x)=\alpha e^{\beta x}$.
 
-The truncated power hazard of infant mortality can be derived from such a Strehler-Mildvan process by changing two assumptions: 1) Where @Strehler1960 assume a decrease of vitality with time due to ageing one assumes an increase due to growth, and 2) instead of assuming shocks to arrive with a constant rate $\alpha$ one assumes that the risk of experiencing complications is highest at birth and falls over time (according to a shifted Weibull distribution distribution).
+The truncated power hazard of infant mortality can be derived from such a Strehler-Mildvan process by changing two assumptions: 1) Where @Strehler1960 assume a decrease of vitality with time due to ageing one assumes an increase due to growth, and 2) instead of that shocks arrive with a constant rate $\alpha$ one assumes that the risk of experiencing complications is highest at birth and falls over time (according to a shifted Weibull distribution).
 
-## A mortality selection process {-}
+## A mortality selection process
 
 In the multiplicative frailty model [@Vaupel1979] it is assumed that all individuals in a population share the same age specific "baseline hazard" of death $\mu_0(x)$ but on different "frailty" levels $z$ which act multiplicatively on the baseline. Consequently the age specific hazard conditioned on frailty is given by
 
@@ -356,24 +360,24 @@ $$
 
 showing that the population hazard is a product of the baseline hazard and the average frailty among the population at age $x$. By choosing $\mu_0(x)=ae^{-bx}$ and $\text{E}[Z|x]=(x+c)^{-p}$ we express the truncated power-law hazard $\mu_\text{TP}$ as a multiplicative frailty model.
 
-Frailty models can be interpreted in terms of *mortality selection*: Because individuals with a high frailty on average die earlier than those with lower values for $z$ the average frailty among a cohort of individuals declines over time. Above we modeled this decline as an shifted power function of age and consequently $p$ can be interpreted as the approximate elasticity of average frailty wrt. age, 0.69 for the US birth cohort 2005-1999, corresponding to an approximate drop in average frailty by $38\,\%$ for every doubling of age -- a substantial mortality selection shortly after birth.
+Frailty models can be interpreted in terms of *mortality selection*: Because individuals with a high frailty on average die earlier than those with lower values for $z$ the average frailty among a cohort of individuals declines over time. Above we modeled this decline as a shifted power function of age and consequently $p$ can be interpreted as the approximate elasticity of average frailty w.r.t. age, 0.69 for the US birth cohort 2005-1999, corresponding to an approximate drop in average frailty by $38\,\%$ for every doubling of age -- a substantial mortality selection shortly after birth.
 
-While differing in frailty, all individuals of a cohort are assumed to share the same baseline hazard. By modelling this *individual level* risk as an exponential function of age we assume that each additional unit of age decreases an infants risk of death by factor $\exp(-b)$, around $0.4\,\%$ per additional day of age for the 2005-1999 US birth cohort (\@ref(fig:plot-evidence)f). This relatively slow rate of decline may be attributed to *aquired robustness* due to the infants continued growth and development.
+While differing in frailty, all individuals of a cohort are assumed to share the same baseline hazard. By modelling this *individual level* risk as an exponential function of age we assume that each additional unit of age decreases an infants risk of death by factor $\exp(-b)$, around $0.4\,\%$ per additional day of age for the 2005-1999 US birth cohort (Figure \@ref(fig:plot-evidence)f). This relatively slow rate of decline may be attributed to *acquired robustness* due to the infants continued growth and development.
 
-Of course one could, to the same effect, also choose $\mu_0(x)=a(x+c)^{-p}$ and $\text{E}[Z|x]=e^{-bx}$. This model implies that the power-law behavior of the population hazard (mostly seen during the first month of life) arises from individual level processes while above we have assumed that the rapid mortality decline after birth is mostly due to changing average frailty, i.e. mortality selection. Different choices for the baseline hazard and the distribution of frailties can result in the same expression for the population hazard -- an identifiability problem which is well known in the frailty-model literature [e.g. @Hougaard1995].
+Of course one could, to the same effect, also choose $\mu_0(x)=a(x+c)^{-p}$ and $\text{E}[Z|x]=e^{-bx}$. This model implies that the power-law behavior of the population hazard (mostly seen during the first month of life) arises from individual level processes, while above we have assumed that the rapid mortality decline after birth is mostly due to changing average frailty, i.e. mortality selection. Different choices for the baseline hazard and the distribution of frailties can result in the same expression for the population hazard -- an identifiability problem which is well known in the frailty-model literature [e.g. @Hougaard1995].
 
-# Discussion {-}
+# Discussion
 
 Using highly detailed individual level data on the timing of death over the first year of life I found strong evidence for an exponentially truncated power-law behavior of the hazard of infant death in two recent US birth cohorts. The shift from a power-law regime to an exponential decline has not been noted in the literature before and invites speculation regarding the mechanisms that give rise to such a pattern. Observed hazards may be the result of mechanisms which have been discussed at length in the context of senescent risk of death: mortality selection due to heterogeneous frailties and a shock-recovery process.
 
-The frailty hypothesis may be tested via a decomposition analysis. @Vaupel2010a prove that, if the population hazard $\overline\mu(x)$ and the stratum specific hazards $\mu(x|z)$ are known for a cohort, then the rate of change over age of $\overline\mu(x)$ can be decomposed into a "direct change" component and change due to the process of mortality selection. Using this decomposition one could for example calculate how much of the decline in the risk of death over the first week of life as shown in figure \@ref(fig:plot-imort) is due the changing population composition by prematurity status resulting from the early death of extremely premature infants, i.e. mortality selection.
+The frailty hypothesis may be tested via a decomposition analysis. @Vaupel2010a prove that, if the population hazard $\overline\mu(x)$ and the stratum specific hazards $\mu(x|z)$ are known for a cohort, then the rate of change over age of $\overline\mu(x)$ can be decomposed into a "direct change" component and change due to the process of mortality selection. Using this decomposition one could for example calculate how much of the decline in the risk of death over the first week of life as shown in Figure \@ref(fig:plot-imort) is due the changing population composition by prematurity status resulting from the early death of extremely premature infants, i.e. mortality selection.
 
 A test of the shock-recovery model is less straightforward as it requires both a clear definition of what constitutes a shock and data on the timing of such shocks to see if their rate of occurrence corresponds to either the exponential or the power-law component of the truncated power-law hazard.
 
 Note that the truncated power hazard discussed in this paper does not permit an interpretation as a competing-risks model. Such a model was implied by @Bourgeois-Pichat1951 for the age-trajectory of infant mortality, which he partitioned into deaths due to congenital disorders and deaths due to accidents. An alternative competing-risks model featuring a power-law and an exponential term could take the form $\mu_\text{CR}(x)=a_1(x+c)^{-p} + a_2\exp(-bx)$,
 which may be re-written as $\mu_\text{CR}(x)=\exp[\log a_1 - p\log(x+c)] + \exp[\log a_2 - bx]$. Sums-of-exponentials can be fit in the GLM framework by using a composite-link-function [@Thompson1981; @Camarda2016]. Assuming that deaths due to intrinsic causes follow a power-law behavior whereas extrinsic deaths feature the hazard of a negative-Gompertz distribution, this competing-risks formulation of the age-specific hazard of infant death over time permits a shape-based cause-of-death decomposition.
 
-The results of this paper indicate that the proportional hazards assumption does not hold across APGAR score and prematurity strata. The association of those variables with the baseline hazard of death over the first year of life is highly non-proportional with much of the "effect" focussed on the first weeks of life. Indeed differences in the rate of post-neonatal mortality decline imply that the relative difference in mortality between very frail and less frail infants diminishes over age to some degree.
+The results of this paper indicate that the proportional hazards assumption does not hold across APGAR score and prematurity strata. The association of those variables with the baseline hazard of death over the first year of life is highly non-proportional with much of the "effect" focused on the first weeks of life. Indeed differences in the rate of post-neonatal mortality decline imply that the relative difference in mortality between very frail and less frail infants diminishes over age to some degree.
 
 Insofar as the truncated power hazard generalizes to populations other than present day US it can become a valuable tool for working with low-quality data on the timing of infant deaths. Based on $\mu_\text{TP}$ one can calculate life-table $a_0$ from coarse data; design model infant-life-tables; smooth over data artifacts such as age-heaping; estimate seasonal effects on mortality separately from age effects; or include realistic infant mortality schedules into a simulation model.
 
@@ -385,19 +389,19 @@ Insofar as the truncated power hazard generalizes to populations other than pres
 load('out/all_the_CIs_M.Rdata')
 
 all_the_CIs_M %>%
+  select(-1) %>%
   kable(
     format = 'latex',
     caption = 'The factor of mortality reduction over the first 7 days of life. Parameter estimates and $95\\%$ CIs calculated from the truncated-power hazard GLM fits for various US infant cohorts.',
     booktabs = T,
-    #align = c('l', 'l', 'c', 'c', 'c', 'c'),
-    col.names = c('', '', 'Female', 'Male', 'Female', 'Male')
+    col.names = c('', '', 'Female', 'Male')
   ) %>%
   kable_styling() %>%
-  add_header_above(
-    c(' ' = 2, '1995-1999' = 2, '2005-2009' = 2)
-  ) %>%
-  collapse_rows(1:3, latex_hline = 'major') %>%
-  landscape()
+  group_rows(start_row = 1, end_row = 14, group_label = '1995-1999') %>%
+  group_rows(start_row = 15, end_row = 28, group_label = '2000-2005') %>%
+  row_spec(0, bold = TRUE) %>%
+  collapse_rows(1, latex_hline = 'major') %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
 ```
 
 \clearpage
@@ -406,19 +410,20 @@ all_the_CIs_M %>%
 load('out/all_the_CIs_a.Rdata')
 
 all_the_CIs_a %>%
+  select(-1) %>%
   kable(
     format = 'latex',
     caption = 'Estimated $a$ parameters of truncated-power hazard GLM fits for various US infant cohorts. Mean estimates and $95\\%$ confidence intervals are based on 1000 parametric bootstrap replications.',
     booktabs = T,
     #align = c('l', 'l', 'c', 'c', 'c', 'c'),
-    col.names = c('', '', 'Female', 'Male', 'Female', 'Male')
+    col.names = c('', '', 'Female', 'Male')
   ) %>%
   kable_styling() %>%
-  add_header_above(
-    c(' ' = 2, '1995-1999' = 2, '2005-2009' = 2)
-  ) %>%
-  collapse_rows(1:3, latex_hline = 'major') %>%
-  landscape()
+  group_rows(start_row = 1, end_row = 14, group_label = '1995-1999') %>%
+  group_rows(start_row = 15, end_row = 28, group_label = '2000-2005') %>%
+  row_spec(0, bold = TRUE) %>%
+  collapse_rows(1, latex_hline = 'major') %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
 ```
 
 \clearpage
@@ -427,19 +432,20 @@ all_the_CIs_a %>%
 load('out/all_the_CIs_b.Rdata')
 
 all_the_CIs_b %>%
+  select(-1) %>%
   kable(
     format = 'latex',
     caption = 'Estimated $b$ parameters of truncated-power hazard GLM fits for various US infant cohorts. Mean estimates and $95\\%$ confidence intervals are based on 1000 parametric bootstrap replications.',
     booktabs = T,
     #align = c('l', 'l', 'c', 'c', 'c', 'c'),
-    col.names = c('', '', 'Female', 'Male', 'Female', 'Male')
+    col.names = c('', '', 'Female', 'Male')
   ) %>%
   kable_styling() %>%
-  add_header_above(
-    c(' ' = 2, '1995-1999' = 2, '2005-2009' = 2)
-  ) %>%
-  collapse_rows(1:3, latex_hline = 'major') %>%
-  landscape()
+  group_rows(start_row = 1, end_row = 14, group_label = '1995-1999') %>%
+  group_rows(start_row = 15, end_row = 28, group_label = '2000-2005') %>%
+  row_spec(0, bold = TRUE) %>%
+  collapse_rows(1, latex_hline = 'major') %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
 ```
 
 \clearpage
@@ -448,19 +454,42 @@ all_the_CIs_b %>%
 load('out/all_the_CIs_c.Rdata')
 
 all_the_CIs_c %>%
+  select(-1) %>%
   kable(
     format = 'latex',
     caption = 'Estimated $c$ parameters of truncated-power hazard GLM fits for various US infant cohorts. Mean estimates and $95\\%$ confidence intervals are based on 1000 parametric bootstrap replications.',
     booktabs = T,
     #align = c('l', 'l', 'c', 'c', 'c', 'c'),
-    col.names = c('', '', 'Female', 'Male', 'Female', 'Male')
+    col.names = c('', '', 'Female', 'Male')
   ) %>%
   kable_styling() %>%
-  add_header_above(
-    c(' ' = 2, '1995-1999' = 2, '2005-2009' = 2)
+  group_rows(start_row = 1, end_row = 14, group_label = '1995-1999') %>%
+  group_rows(start_row = 15, end_row = 28, group_label = '2000-2005') %>%
+  row_spec(0, bold = TRUE) %>%
+  collapse_rows(1, latex_hline = 'major') %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
+```
+
+\clearpage
+
+```{r tab-ci-p}
+load('out/all_the_CIs_p.Rdata')
+
+all_the_CIs_p %>%
+  select(-1) %>%
+  kable(
+    format = 'latex',
+    caption = 'Estimated $p$ parameters of truncated-power hazard GLM fits for various US infant cohorts. Mean estimates and $95\\%$ confidence intervals are based on 1000 parametric bootstrap replications.',
+    booktabs = T,
+    #align = c('l', 'l', 'c', 'c', 'c', 'c'),
+    col.names = c('', '', 'Female', 'Male')
   ) %>%
-  collapse_rows(1:3, latex_hline = 'major') %>%
-  landscape()
+  kable_styling() %>%
+  group_rows(start_row = 1, end_row = 14, group_label = '1995-1999') %>%
+  group_rows(start_row = 15, end_row = 28, group_label = '2000-2005') %>%
+  row_spec(0, bold = TRUE) %>%
+  collapse_rows(1, latex_hline = 'major') %>%
+  add_footnote('Raw data: US infants born in years 2005-2009. NCHS Cohort Linked Birth - Infant Death Data Files.', notation = 'none')
 ```
 
 \clearpage
